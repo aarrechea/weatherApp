@@ -41,3 +41,10 @@ example
 # generated native folders
 /ios
 /android
+
+# Android Studio project files (local settings and caches)
+.idea/
+
+# Reference script from Open-Meteo's variable picker. It contains personal
+# coordinates, so it stays on this machine and is never published.
+open_meteo.py
