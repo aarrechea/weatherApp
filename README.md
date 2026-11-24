@@ -1,56 +1,60 @@
-# Welcome to your Expo app 👋
+# Weather App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A personal weather app for Android, built around a **home-screen widget**. It shows the current conditions, the next hours and the coming days, and can keep the current weather in a notification on the lock screen. There is no backend and no account: the data comes straight from [Open-Meteo](https://open-meteo.com/).
 
-## Get started
+It is a personal project, installed as an APK. It is not published on any store.
 
-1. Install dependencies
+## What it does
 
-   ```bash
-   npm install
-   ```
+- **A 5 × 4 home-screen widget** with three screens you step through with back and forward buttons:
+  - **Current:** temperature, condition, feels-like, today's max and min, humidity, wind, gusts, visibility, sunrise and sunset, and the chance and amount of rain for the rest of today.
+  - **Hourly:** six hours, every third hour, with temperature, rain and wind.
+  - **Daily:** the eight days after today, with max and min, rain, wind and the chance of rain.
+- **Follow me plus up to three saved places.** A location button on the widget cycles through them. City search uses Open-Meteo's geocoding.
+- **An optional ongoing notification** with the current conditions, also shown on the lock screen.
+- **Adjustable widget background** from fully solid down to 50% opacity.
+- **Works offline:** the last forecast for each place is kept and shown, marked as offline, when there is no connection.
+- Updates itself about every 30 minutes, and on demand with the refresh button.
 
-2. Start the app
+## Built with
 
-   ```bash
-   npx expo start
-   ```
+React Native and Expo (SDK 58) with TypeScript, Expo Router, React Native Paper and `react-native-android-widget`. The structure, the tools and how the pieces fit together are described in [implementation.md](implementation.md).
 
-In the output, you'll find options to open the app in a
+## Running it
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+You need Node.js, a JDK (17 or newer; it is developed with 25) and the Android SDK (platform 37 and NDK 27.1.12297006; Gradle can download them), with `JAVA_HOME` and `ANDROID_HOME` set. The app uses native code for the widget, so Expo Go cannot run it: it needs a real build.
 
 ```bash
-npm run reset-project
+npm install
+
+# generate the native Android project (git-ignored)
+CI=1 npx expo prebuild --platform android --no-install
+
+# build a release APK that includes the JavaScript
+cd android
+./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,x86_64
+
+# install on a connected phone or emulator
+adb install -r app/build/outputs/apk/release/app-release.apk
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Then open the app, and add the **Weather** widget from the home screen's widget picker (or with the button in the app).
 
-### Other setup steps
+Checks:
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+npx tsc --noEmit
+npm run lint
+npm run format:check
+```
 
-## Learn more
+### Permissions
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Location**, only for the follow-me place. The widget's background updates need "Allow all the time". Saved places work without any location permission.
+- **Notifications**, only if you turn on the current-weather notification in Settings.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+The release APK from these steps is signed with a generated debug key. Use your own signing key before you rely on updates over an installed copy.
 
-## Join the community
+## Data
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Weather data by [Open-Meteo.com](https://open-meteo.com/), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Open-Meteo's free service is for non-commercial use.
